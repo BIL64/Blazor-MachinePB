@@ -1,0 +1,67 @@
+﻿@using MachinePB.Services;
+@using MachinePB.Pages;
+@inherits LayoutComponentBase
+@inject HttpClient Http
+
+<nav class="navarea">
+    <NavMenu />
+</nav>
+
+<main class="area">
+    <div class="space1">
+        <section>
+            <h5 style="text-align: left">D a i l y &nbsp;S t a t i s t i c s</h5><br />
+            <table width="50%" height="150">
+                <tr>
+                    <td><h6 style="text-align: left; color:yellow ">Devices</h6></td>
+                    <td><h5>@Auxx.NumT</h5></td>
+                </tr>
+                <tr>
+                    <td><h6 style="text-align: left; color:limegreen">In operation</h6></td>
+                    <td><h5>@Auxx.NumI</h5></td>
+                </tr>
+                <tr>
+                    <td><h6 style="text-align: left; color:red">Out of order</h6></td>
+                    <td><h5>@Auxx.NumO</h5></td>
+                </tr>
+                <tr>
+                    <td><h6 style="text-align: left">Last edit</h6></td>
+                    <td><h6><i>@Auxx.Latest</i></h6></td>
+                </tr>
+            </table>
+        </section>
+    </div>
+
+    <div class="space2">@Body</div>
+</main>
+
+@code {
+
+    [Inject]
+    private IMachClient machClient { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {        
+        var mach = await machClient.GetAsync();
+
+        if (mach is not null)
+        {
+            Auxx.NumT = 0; // Variabler för statistik.
+            Auxx.NumI = 0;
+            Auxx.NumO = 0;
+            DateTime Update = DateTime.Parse("0001-01-01 00:00:00"); // År 0 är referensdatumet.
+
+            foreach (var item in mach) // Uppdaterar statistiken.
+            {
+                Auxx.NumT++;
+                if (item.Status) Auxx.NumI++; else Auxx.NumO++;
+
+                if (item.DateTimeCreate > Update && item.Location != null)
+                {
+                    Auxx.Latest = item.Location; // Söker den senaste uppdateringen.
+                    Update = item.DateTimeCreate; // Den första blir den senaste osv.
+                }
+            }
+        }
+    }
+}

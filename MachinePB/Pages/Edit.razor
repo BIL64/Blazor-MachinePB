@@ -1,0 +1,117 @@
+﻿@page "/edit/{No:int}"
+@using MachinePB.Services;
+@using Microsoft.Extensions.Logging
+@using ServerAPI.Entities;
+@inject ILogger<Create> Logger
+@inject NavigationManager NavManager
+
+<PageTitle>Update machine</PageTitle>
+
+<h5>Update machine</h5>
+
+<div>
+    <EditForm Model="@machine" OnSubmit="@HandleSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group m-md-3">
+            <InputCheckbox class="control-label checkbox" type="checkbox" id="switch" @bind-Value="machine.Status" placeholder="@machine.Status" />
+            <label class="control-label toggle" for="switch"></label>
+            @if (machine.Status)
+            {
+                <span style="position: relative; top: -7px"> ON</span>
+            }
+            else
+            {
+                <span style="position: relative; top: -7px"> OFF</span>
+            }
+        </div>
+        <div class="form-group m-md-3">
+            <label class="control-label">
+                Location:<span class="fault">@Lfault</span>
+                <InputText type="text" class="form-control" @bind-Value="machine.Location" placeholder="@machine.Location" />
+            </label>
+        </div>
+        <div class="form-group m-md-3">
+            <label class="control-label">
+                Installation date:<span class="fault">@Dfault</span>
+                <InputText type="text" class="form-control" @bind-Value="machine.Date" placeholder="@machine.Date" />
+            </label>
+        </div>
+        <div class="form-group m-md-3">
+            <label class="control-label">
+                Type:<span class="fault">@Tfault</span>
+                <InputText type="text" class="form-control" @bind-Value="machine.Type" placeholder="@machine.Type" />
+            </label>
+        </div>
+        <div class="form-group m-md-3">
+            <NavLink href="fetchdata"><button type="button" class="btn btn-info btn-sm">REGRET</button></NavLink>&nbsp;
+            <button type="submit" class="btn btn-primary btn-sm" title="Submit changes">OK</button>
+        </div>
+    </EditForm>
+</div>
+
+
+@code {
+
+    private Machine machine = new();
+
+    [Inject]
+    private IMachClient machClient { get; set; } = default!;
+
+    [Parameter]
+    public int No { get; set; }
+
+    public string _Id { get; set; } = string.Empty;
+
+    private string Lfault { get; set; } = string.Empty;
+    private string Dfault { get; set; } = string.Empty;
+    private string Tfault { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var mach = await machClient.GetAsync();
+
+        if (mach is not null) // Hämtar det id som motsvarar den maskinens nummer.
+        {
+            foreach (var item in mach)
+            {
+                if (No == item.Number)
+                {
+                    _Id = item.Id;
+                }
+            }
+        }
+
+        var machall = await machClient.GetAsync(_Id); // Hämtar maskinen som ska redigeras och lägger in allt i machine.
+
+        if (machall is not null)
+        {
+            machine = machall;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        Logger.LogInformation("HandleSubmit called");
+
+        if (machine.Location != "" && machine.Date != "" && machine.Type != "")
+        {
+            machine.DateTimeCreate = DateTime.UtcNow;
+
+            if (machine is null)
+            {
+                throw new ArgumentNullException(nameof(machine));
+            }
+
+            await machClient.PutAsync(_Id, machine);
+            Auxx.IsEdit = true;
+            NavManager.NavigateTo("/fetchdata");
+        }
+        else
+        {
+            if (machine.Location == "") Lfault = " Required field..."; else Lfault = "";
+            if (machine.Date == "") Dfault = " Required field..."; else Dfault = "";
+            if (machine.Type == "") Tfault = " Required field..."; else Tfault = "";
+        }
+    }
+}

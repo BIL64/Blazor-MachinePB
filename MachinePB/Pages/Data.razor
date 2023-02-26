@@ -1,0 +1,101 @@
+﻿@page "/data/{No:int}"
+@using MachinePB.Services;
+@using Microsoft.Extensions.Logging
+@using ServerAPI.Entities;
+@inject ILogger<Create> Logger
+@inject NavigationManager NavManager
+
+<PageTitle>Send data</PageTitle>
+
+<h5>Send data</h5>
+
+<div>
+    <EditForm Model="@machine" OnSubmit="@HandleSubmit">
+        <div class="form-group m-md-3">
+            Id for this device: @machine.Id
+        </div>
+        <div class="form-group m-md-3">
+            Location: @machine.Location
+        </div>
+        <div class="form-group m-md-3">
+            This device is
+            @if (machine.Status)
+            {
+                <span>OnLine</span>
+            }
+            else
+            {
+                <span style="color:red">OffLine</span>
+            }
+        </div>
+        <div class="form-group m-md-3">
+            <label class="control-label">
+                Add or change data string:<span class="fault">@Dfault</span>
+                <InputText type="text" class="form-control" @bind-Value="machine.DataCode" placeholder="@machine.DataCode" />
+            </label>
+        </div>
+        <div class="form-group m-md-3">
+            <NavLink href="fetchdata"><button type="button" class="btn btn-info btn-sm">REGRET</button></NavLink>&nbsp;
+            <button type="submit" class="btn btn-danger btn-sm" title="Submit">SEND</button>
+        </div>
+    </EditForm>
+</div>
+
+
+@code {
+
+    private Machine machine = new();
+
+    [Inject]
+    private IMachClient machClient { get; set; } = default!;
+
+    [Parameter]
+    public int No { get; set; }
+
+    public string _Id { get; set; } = string.Empty;
+
+    private string Dfault { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var mach = await machClient.GetAsync();
+
+        if (mach is not null) // Hämtar det id som motsvarar den maskinens nummer.
+        {
+            foreach (var item in mach)
+            {
+                if (No == item.Number) _Id = item.Id;
+            }
+        }
+
+        var machall = await machClient.GetAsync(_Id); // Hämtar maskinen vars datasträng ska uppdateras och lägger in allt i machine.
+
+        if (machall is not null)
+        {
+            machine = machall;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        Logger.LogInformation("HandleSubmit called");
+
+        if (machine.Status)
+        {
+            machine.DateTimeCreate = DateTime.UtcNow;
+
+            if (machine is null)
+            {
+                throw new ArgumentNullException(nameof(machine));
+            }
+
+            await machClient.PutAsync(_Id, machine);
+            Auxx.IsEdit = true;
+            NavManager.NavigateTo("/fetchdata");
+        }
+        else
+        {
+            Dfault = " This device is OFF !";
+        }
+    }
+}

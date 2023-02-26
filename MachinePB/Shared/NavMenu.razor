@@ -1,0 +1,9 @@
+﻿<div class="navspace1"><NavLink class="text-decoration-none" title="Refresh" href="/">MACHINE-PARK</NavLink></div>
+<div class="navspace2">
+    <NavLink href="/fetchdata"><button type="button" class="butt1"><span class="oi oi-flash" aria-hidden="true"></span> All devices</button></NavLink>
+    </div>
+<div class="navspace3"><span class="navspan">@Date</span></div>
+
+@code{
+    private string Date = DateTime.UtcNow.ToString().Substring(0, DateTime.UtcNow.ToString().Length - 8); // Tidsangivelsen avskils från datumet.
+}

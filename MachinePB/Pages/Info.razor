@@ -1,0 +1,73 @@
+﻿@page "/info/{No:int}"
+@using MachinePB.Services;
+@using Microsoft.Extensions.Logging
+@using ServerAPI.Entities;
+
+<PageTitle>Details about this machine</PageTitle>
+
+<h5>Details about this machine</h5>
+
+<div>
+    <div class="form-group m-md-3" style="color:lightgray">
+        Last updated: @machine.DateTimeCreate
+    </div>
+    <div class="form-group m-md-3">
+        Location: @machine.Location
+    </div>
+    <div class="form-group m-md-3">
+        Istallation date: @machine.Date
+    </div>
+    <div class="form-group m-md-3">
+        Type: @machine.Type
+    </div>
+    <div class="form-group m-md-3">
+        @if (@machine.Status)
+        {
+            <span style="color:limegreen">This device is in operation...</span>
+        }
+        else
+        {
+            <span style="color:magenta">This device is out of order...</span>
+        }
+    </div>
+    <div class="form-group m-md-3" style="color:gray">
+        Data string: @machine.DataCode
+    </div>
+    <div class="form-group m-md-3">
+        <NavLink href="fetchdata"><button type="button" class="btn btn-info btn-sm">RETURN</button></NavLink>&nbsp;
+    </div>
+</div>
+
+
+@code {
+
+    private Machine machine = new();
+
+    [Inject]
+    private IMachClient machClient { get; set; } = default!;
+
+    [Parameter]
+    public int No { get; set; }
+
+    public string _Id { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var mach = await machClient.GetAsync();
+
+        if (mach is not null) // Hämtar det id som motsvarar den maskinens nummer.
+        {
+            foreach (var item in mach)
+            {
+                if (No == item.Number) _Id = item.Id;
+            }
+        }
+
+        var machall = await machClient.GetAsync(_Id); // Hämtar maskinen som ska visas och lägger in allt i machine.
+
+        if (machall is not null)
+        {
+            machine = machall;
+        }
+    }
+}

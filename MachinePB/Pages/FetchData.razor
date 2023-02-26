@@ -1,0 +1,194 @@
+﻿@page "/fetchdata"
+@using MachinePB.Services;
+@using ServerAPI.Entities;
+
+<PageTitle>List of Devices</PageTitle>
+
+<nav style="display: flex">
+    <div style="width: 50%; text-align: left; color: white"><h5>@Emptydb</h5></div>
+    <div style="margin-left: auto; margin-right: 0">
+        <NavLink href="create"><button class="oi oi-action-redo btn btn-dark btn-sm"> New Device</button></NavLink>
+    </div>
+</nav>
+
+@if (machine == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table tableP collapse1">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>ID</th>
+                <th>Location</th>
+                <th>Install date</th>
+                <th>Type</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var data in machine)
+            {
+                <tr>
+                    <td>@data.Number</td>
+                    <td>@data.Id</td>
+                    <td>@data.Location</td>
+                    <td>@data.Date</td>
+                    <td>@data.Type</td>
+                    @if (data.Status)
+                    {
+                        <td><img width="75" src="images/inoperation.png" alt="In operation" title="In operation" /></td>
+                    }
+                    else
+                    {
+                        <td><img width="75" src="images/outoforder.png" alt="Out of order" title="Out of order" /></td>
+                    }
+                    @{
+                        hpage = $"info/{data.Number}";
+                    }
+                    <td class="noline"><NavLink href="@hpage" class="oi oi-aperture text-white text-decoration-none" title="Details about this device"></NavLink></td>
+                    @{
+                        hpage = $"edit/{data.Number}";
+                    }
+                    <td class="noline"><NavLink href="@hpage" class="oi oi-task text-white text-decoration-none" title="Update this device"></NavLink></td>
+                    @{
+                        hpage = $"delete/{data.Number}";
+                    }
+                    <td class="noline"><NavLink href="@hpage" class="oi oi-warning text-warning text-decoration-none" title="Remove device"></NavLink></td>
+                    @{
+                        hpage = $"data/{data.Number}";
+                    }
+                    <td class="noline"><NavLink href="@hpage" class="oi oi-calculator text-opacity-50 text-decoration-none" title="In data"></NavLink></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <table class="table tableP collapse2">
+        <thead>
+            <tr>
+                <th>
+                    No | ID | Location | Date | Type | Status
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var data in machine)
+            {
+                <tr>
+                    &nbsp;
+                </tr>
+                <tr>
+                    <td>@data.Number</td>
+                </tr>
+                <tr>
+                    <td>@data.Id</td>
+                </tr>
+                <tr>
+                    <td>@data.Location</td>
+                </tr>
+                <tr>
+                    <td>@data.Date</td>
+                </tr>
+                <tr>
+                    <td>@data.Type</td>
+                </tr>
+                <tr>
+                    @if (data.Status)
+                    {
+                        <td><img style="width: 60px; height: auto" src="images/inoperation.png" alt="In operation" title="In operation" /></td>
+                    }
+                    else
+                    {
+                        <td><img style="width: 60px; height: auto" src="images/outoforder.png" alt="Out of order" title="Out of order" /></td>
+                    }
+                </tr>
+                <tr style="border: 1px solid">
+                    <td>
+                        @{
+                            hpage = $"info/{data.Number}";
+                        }
+                        <NavLink href="@hpage" class="oi oi-aperture text-white text-decoration-none" title="Info about this device"></NavLink>&nbsp;&nbsp;
+                        @{
+                            hpage = $"edit/{data.Number}";
+                        }
+                        <NavLink href="@hpage" class="oi oi-task text-white text-decoration-none" title="Edit this device"></NavLink>&nbsp;&nbsp;
+                        @{
+                            hpage = $"delete/{data.Number}";
+                        }
+                        <NavLink href="@hpage" class="oi oi-warning text-warning text-decoration-none" title="Remove device"></NavLink>&nbsp;&nbsp;
+                        @{
+                            hpage = $"data/{data.Number}";
+                        }
+                        <NavLink href="@hpage" class="oi oi-calculator text-opacity-50 text-decoration-none" title="In data"></NavLink>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private List<Machine> machine = new List<Machine>();
+
+    [Inject]
+    private IMachClient machClient { get; set; } = default!;
+
+    private string Emptydb { get; set; } = "List of Devices";
+
+    private string hpage { get; set; } = string.Empty; // Adressering.
+
+    protected override async Task OnInitializedAsync()
+    {
+        var mach = await machClient.GetAsync();
+
+        if (mach is not null)
+        {
+            machine = mach.ToList();
+
+            if (Auxx.IsEdit) // Görs enbart om en maskin har lagts till eller raderats.
+            {
+                int Num = 1;
+                DateTime Update = DateTime.Parse("0001-01-01 00:00:00"); // År 0 är referensdatumet.
+
+                foreach (var item in machine) // Lägger in nya nummer för varje maskin.
+                {
+                    item.Number = Num;
+                    Num++;
+                    await machClient.PutAsync(item.Id, item); // Puttar maskinen i databasen med det nya numret.
+
+                    if (item.DateTimeCreate > Update && item.Location != null)
+                    {
+                        Auxx.Latest = item.Location; // Söker den senaste uppdateringen.
+                        Update = item.DateTimeCreate; // Den första blir den senaste osv.
+                    }
+                }
+
+                var machnew = await machClient.GetAsync(); // Hämtar ånyo alla maskiner.
+
+                if (machnew is not null) machine = machnew.ToList(); // Och gör en ny lista.
+                Auxx.IsEdit = false;
+            }
+
+            if (machine.Count < 1) Emptydb = "No devices !";
+
+            Auxx.NumT = 0; // Variabler för statistik.
+            Auxx.NumI = 0;
+            Auxx.NumO = 0;
+
+            foreach (var item in mach) // Uppdaterar statistiken.
+            {
+                Auxx.NumT++;
+                if (item.Status) Auxx.NumI++; else Auxx.NumO++;
+            }
+            base.StateHasChanged();
+        }
+        else
+        {
+            Emptydb = "No devices !";
+        }
+    }
+}
