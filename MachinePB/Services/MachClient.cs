@@ -12,7 +12,8 @@ namespace MachinePB.Services
         public MachClient(HttpClient httpClient)
         {
             this.httpClient = httpClient;
-            this.httpClient.BaseAddress = new Uri("https://localhost:7078");
+            //this.httpClient.BaseAddress = new Uri("https://localhost:7078"); // Lokal databas.
+            this.httpClient.BaseAddress = new Uri("https://machinepbserverapi.azurewebsites.net"); // Azure databas.
             this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
