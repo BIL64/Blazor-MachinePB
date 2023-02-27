@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PublicER", "..\PublicER\Pub
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerAPI", "..\ServerAPI\ServerAPI.csproj", "{35E111E7-6585-4AEC-A7D2-B5D7204DF55E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempFuncMachine", "..\TempFuncMachine\TempFuncMachine.csproj", "{C75EB87A-F47C-4D3A-89D0-443C4DFE2213}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{35E111E7-6585-4AEC-A7D2-B5D7204DF55E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35E111E7-6585-4AEC-A7D2-B5D7204DF55E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35E111E7-6585-4AEC-A7D2-B5D7204DF55E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C75EB87A-F47C-4D3A-89D0-443C4DFE2213}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C75EB87A-F47C-4D3A-89D0-443C4DFE2213}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C75EB87A-F47C-4D3A-89D0-443C4DFE2213}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C75EB87A-F47C-4D3A-89D0-443C4DFE2213}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
