@@ -1,7 +1,4 @@
 ﻿@page "/create"
-@using MachinePB.Services;
-@using Microsoft.Extensions.Logging
-@using ServerAPI.Entities;
 @inject ILogger<Create> Logger
 @inject NavigationManager NavManager
 
@@ -31,11 +28,6 @@
                 <InputText type="text" class="form-control" @bind-Value="machine.Type" />
             </label>
         </div>
-        @*<div class="form-group m-md-3">
-            <InputCheckbox class="control-label checkbox" type="checkbox" id="switch" @bind-Value="machine.Status" />
-            <label class="control-label toggle" for="switch"></label>
-            @if (machine.Status) {<span style="position: relative; top: -7px"> ON</span>} else {<span style="position: relative; top: -7px"> OFF</span>}
-        </div>*@
         <div class="form-group m-md-3">
             <NavLink href="fetchdata"><button type="button" class="btn btn-info btn-sm">REGRET</button></NavLink>&nbsp;
             <button type="submit" class="btn btn-primary btn-sm" title="Submit changes">OK</button>

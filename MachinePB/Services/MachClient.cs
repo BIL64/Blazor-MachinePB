@@ -12,14 +12,17 @@ namespace MachinePB.Services
         public MachClient(HttpClient httpClient)
         {
             this.httpClient = httpClient;
-            //this.httpClient.BaseAddress = new Uri("https://localhost:7078"); // Lokal databas.
-            this.httpClient.BaseAddress = new Uri("https://machinepbserverapi.azurewebsites.net"); // Azure databas.
+            this.httpClient.BaseAddress = new Uri("https://localhost:7078"); // Lokal databas.
+            //this.httpClient.BaseAddress = new Uri("https://machinepbserverapi.azurewebsites.net"); // Azure SQL databas.
+            //this.httpClient.BaseAddress = new Uri("http://localhost:7172"); // Function App databas.
+            //this.httpClient.BaseAddress = new Uri("https://machinetempf.azurewebsites.net"); // Function App databas.
             this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public async Task<IEnumerable<Machine>?> GetAsync()
         {
-            return await httpClient.GetFromJsonAsync<IEnumerable<Machine>>("api/Machine");
+            var response = await httpClient.GetFromJsonAsync<IEnumerable<Machine>>("api/Machine");
+            return response;
         }
 
         public async Task<Machine?> GetAsync(string id)

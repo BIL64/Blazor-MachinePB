@@ -26,10 +26,10 @@ namespace ServerAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Machine>>> GetMachine()
         {
-          if (_context.Machine == null)
-          {
-              return NotFound();
-          }
+            if (_context.Machine == null)
+            {
+                return NotFound();
+            }
             return await _context.Machine.ToListAsync();
         }
 
@@ -37,10 +37,10 @@ namespace ServerAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Machine>> GetMachine(string id)
         {
-          if (_context.Machine == null)
-          {
-              return NotFound();
-          }
+            if (_context.Machine == null)
+            {
+                return NotFound();
+            }
             var machine = await _context.Machine.FindAsync(id);
 
             if (machine == null)
