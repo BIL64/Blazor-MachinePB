@@ -54,7 +54,7 @@ else
                     @{
                         hpage = $"delete/{data.Number}";
                     }
-                    <td class="noline"><NavLink href="@hpage" class="oi oi-warning text-warning text-decoration-none" title="Remove device"></NavLink></td>
+                    <td class="noline"><NavLink href="@hpage" class="oi oi-circle-x text-danger text-decoration-none" title="Remove device"></NavLink></td>
                     @{
                         hpage = $"data/{data.Number}";
                     }
@@ -116,7 +116,7 @@ else
                         @{
                             hpage = $"delete/{data.Number}";
                         }
-                        <NavLink href="@hpage" class="oi oi-warning text-warning text-decoration-none" title="Remove device"></NavLink>&nbsp;&nbsp;
+                        <NavLink href="@hpage" class="oi oi-circle-x text-danger text-decoration-none" title="Remove device"></NavLink>&nbsp;&nbsp;
                         @{
                             hpage = $"data/{data.Number}";
                         }
