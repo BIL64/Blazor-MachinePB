@@ -2,7 +2,7 @@
 Övn 16 - Industriell maskinpark - Blazor WASM. Övn 17 - Backend med Azure Functions
 
 Detta var den första övningen i Blazor och där vi fick möjlighet att prova på hur man kommunicerar via internet.
-Upplägget är en klient och en server. Servern kan ligga var som helst och så även med klienten. Det är en mängd
+Upplägget är en klient och en server. Servern kan ligga var som helst och så även klienten. Det är en mängd
 NuGet resurser (27 stycken) som ser till så att allt fungerar, bla. HttpClient factory.
 
 Det var svårt att applicera alla funktioner som kravspecen ställde. Övningen 17 var nämligen kopplad till detta
